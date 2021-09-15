@@ -31,13 +31,31 @@ func All(ctx context.Context, phrase string, files []string) <-chan []Result {
 	return ch
 }
 
+func Any(ctx context.Context, phrase string, files []string) <-chan Result {
+	ch := make(chan Result, 10000)
+	for _, file := range files {
+		result, err := lines(file, phrase)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+		if len(result) > 0 {
+			ch <- result[0]
+			break
+		}
+	}
+
+	close(ch)
+	return ch
+}
+
 func lines(file, phrase string) ([]Result, error) {
 	result := []Result{}
 
 	data, err := os.ReadFile(file)
 	if err != nil {
-		d, _ := os.Getwd()
-		log.Print(d, err)
+		log.Print(err)
+		return nil, err
 	}
 	s := string(data)
 	lines := strings.Split(s, "\n")
