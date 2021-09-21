@@ -32,7 +32,7 @@ func All(ctx context.Context, phrase string, files []string) <-chan []Result {
 }
 
 func Any(ctx context.Context, phrase string, files []string) <-chan Result {
-	ch := make(chan Result, 10000)
+	ch := make(chan Result, 1)
 	for _, file := range files {
 		result, err := lines(file, phrase)
 		if err != nil {
